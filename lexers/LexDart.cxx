@@ -10,7 +10,6 @@
 #include <cstring>
 
 #include <string>
-#include <string_view>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -23,7 +22,7 @@
 #include "LexAccessor.h"
 #include "Accessor.h"
 #include "StyleContext.h"
-#include "CharacterSet.h"
+#include "LexCharacterSet.h"
 #include "LexerModule.h"
 #include "OptionSet.h"
 #include "DefaultLexer.h"
@@ -93,7 +92,7 @@ constexpr bool IsDartIdentifierChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '$';
 }
 
-constexpr bool IsDefinableOperator(int ch) noexcept {
+/*constexpr*/ bool IsDefinableOperator(int ch) noexcept {
 	// https://github.com/dart-lang/sdk/blob/main/sdk/lib/core/symbol.dart
 	return AnyOf(ch, '+', '-', '*', '/', '%', '~', '&', '|',
 					 '^', '<', '>', '=', '[', ']');

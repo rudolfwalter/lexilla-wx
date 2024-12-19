@@ -35,6 +35,7 @@
 #include "DefaultLexer.h"
 
 using namespace Scintilla;
+using namespace Scintilla::Internal;
 using namespace Lexilla;
 
 namespace {
@@ -88,8 +89,8 @@ std::string GetNextWord(Accessor &styler, Sci_PositionU start) {
 	return ret;
 }
 
-bool Contains(const std::string &s, std::string_view search) noexcept {
-	return s.find(search) != std::string::npos;
+bool Contains(const std::string &s, Compat::string_view search) noexcept {
+	return s.find(search.data(), 0, search.size()) != std::string::npos;
 }
 
 script_type segIsScriptingIndicator(const Accessor &styler, Sci_PositionU start, Sci_PositionU end, script_type prevValue) {
@@ -508,7 +509,7 @@ constexpr bool IsPhpWordChar(int ch) noexcept {
 	return IsADigit(ch) || IsPhpWordStart(ch);
 }
 
-constexpr bool InTagState(int state) noexcept {
+/*constexpr*/ bool InTagState(int state) noexcept {
 	return AnyOf(state, SCE_H_TAG, SCE_H_TAGUNKNOWN, SCE_H_SCRIPT,
 	       SCE_H_ATTRIBUTE, SCE_H_ATTRIBUTEUNKNOWN,
 	       SCE_H_NUMBER, SCE_H_OTHER,
@@ -673,7 +674,7 @@ constexpr bool isPHPStringState(int state) noexcept {
 	    (state == SCE_HPHP_COMPLEX_VARIABLE);
 }
 
-constexpr bool StyleNeedsBacktrack(int state) noexcept {
+/*constexpr*/ bool StyleNeedsBacktrack(int state) noexcept {
 	return InTagState(state) || isPHPStringState(state);
 }
 
@@ -692,8 +693,8 @@ enum class InstructionTag {
 };
 
 InstructionTag segIsScriptInstruction(AllowPHP allowPHP, int state, const Accessor &styler, Sci_PositionU start, bool isXml) {
-	constexpr std::string_view phpTag = "php";
-	constexpr std::string_view xmlTag = "xml";
+	constexpr Compat::string_view phpTag = "php";
+	constexpr Compat::string_view xmlTag = "xml";
 	const std::string tag = styler.GetRangeLowered(start, start + phpTag.length());
 	if (allowPHP != AllowPHP::None) {
 		// Require <?php or <?=
