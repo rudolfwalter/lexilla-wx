@@ -35,6 +35,7 @@
 #include "SubStyles.h"
 
 using namespace Scintilla;
+using namespace Scintilla::Internal;
 using namespace Lexilla;
 
 namespace {
@@ -91,7 +92,7 @@ inline bool IsOperatorOrSpace(int ch) noexcept {
 	return isoperator(ch) || IsASpace(ch);
 }
 
-bool OnlySpaceOrTab(std::string_view s) noexcept {
+bool OnlySpaceOrTab(Compat::string_view s) noexcept {
 	for (const char ch : s) {
 		if (!IsASpaceOrTab(ch))
 			return false;
@@ -232,7 +233,7 @@ struct PPDefinition {
 	std::string value;
 	bool isUndef;
 	std::string arguments;
-	PPDefinition(Sci_Position line_, std::string_view key_, std::string_view value_, bool isUndef_, std::string_view arguments_) :
+	PPDefinition(Sci_Position line_, Compat::string_view key_, Compat::string_view value_, bool isUndef_, Compat::string_view arguments_) :
 		line(line_), key(key_), value(value_), isUndef(isUndef_), arguments(arguments_) {
 	}
 };
@@ -333,12 +334,12 @@ struct InterpolatingState {
 };
 
 struct Definition {
-	std::string_view name;
-	std::string_view value;
-	std::string_view arguments;
+	Compat::string_view name;
+	Compat::string_view value;
+	Compat::string_view arguments;
 };
 
-constexpr std::string_view TrimSpaceTab(std::string_view sv) noexcept {
+constexpr Compat::string_view TrimSpaceTab(Compat::string_view sv) noexcept {
 	while (!sv.empty() && IsASpaceOrTab(sv.front())) {
 		sv.remove_prefix(1);
 	}
@@ -354,20 +355,20 @@ constexpr std::string_view TrimSpaceTab(std::string_view sv) noexcept {
 // Whitespace separates macro and value in files but keywords use '=' separator.
 // 'endName' contains a set of characters that terminate the name of the macro.
 
-constexpr Definition ParseDefine(std::string_view definition, std::string_view endName) {
+constexpr Definition ParseDefine(Compat::string_view definition, Compat::string_view endName) {
 	Definition ret;
 	definition = TrimSpaceTab(definition);
 	const size_t afterName = definition.find_first_of(endName);
-	if (afterName != std::string_view::npos) {
+	if (afterName != Compat::string_view::npos) {
 		ret.name = definition.substr(0, afterName);
 		if (definition.at(afterName) == '(') {
 			// Macro
 			definition.remove_prefix(afterName+1);
 			const size_t closeBracket = definition.find(')');
-			if (closeBracket != std::string_view::npos) {
+			if (closeBracket != Compat::string_view::npos) {
 				ret.arguments = definition.substr(0, closeBracket);
 				definition.remove_prefix(closeBracket+1);
-				if (!definition.empty() && (endName.find(definition.front()) != std::string_view::npos)) {
+				if (!definition.empty() && (endName.find(definition.front()) != Compat::string_view::npos)) {
 					definition.remove_prefix(1);
 				}
 				ret.value = definition;
@@ -554,7 +555,7 @@ class LexerCPP : public ILexer5 {
 		std::string value;
 		std::string arguments;
 		SymbolValue() noexcept = default;
-		SymbolValue(std::string_view value_, std::string_view arguments_) : value(value_), arguments(arguments_) {
+		SymbolValue(Compat::string_view value_, Compat::string_view arguments_) : value(value_), arguments(arguments_) {
 		}
 		SymbolValue &operator = (const std::string &value_) {
 			value = value_;

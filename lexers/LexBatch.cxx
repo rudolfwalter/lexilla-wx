@@ -27,7 +27,10 @@
 #include "LexCharacterSet.h"
 #include "LexerModule.h"
 
+#include "LexillaCompat.h"
+
 using namespace Lexilla;
+using namespace Scintilla::Internal;
 
 namespace {
 
@@ -70,10 +73,10 @@ constexpr bool IsEscaped(const char* wordStr, Sci_PositionU pos) noexcept {
 	return isQoted;
 }
 
-constexpr bool IsQuotedBy(std::string_view svBuffer, char quote) noexcept {
+constexpr bool IsQuotedBy(Compat::string_view svBuffer, char quote) noexcept {
 	bool CurrentStatus = false;
 	size_t pQuote = svBuffer.find(quote);
-	while (pQuote != std::string_view::npos) {
+	while (pQuote != Compat::string_view::npos) {
 		if (!IsEscaped(svBuffer.data(), pQuote)) {
 			CurrentStatus = !CurrentStatus;
 		}
@@ -84,7 +87,7 @@ constexpr bool IsQuotedBy(std::string_view svBuffer, char quote) noexcept {
 
 // Tests for quote character
 constexpr bool textQuoted(const char *lineBuffer, Sci_PositionU endPos) noexcept {
-	const std::string_view svBuffer(lineBuffer, endPos);
+	const Compat::string_view svBuffer(lineBuffer, endPos);
 	return IsQuotedBy(svBuffer, '\"') || IsQuotedBy(svBuffer, '\'');
 }
 

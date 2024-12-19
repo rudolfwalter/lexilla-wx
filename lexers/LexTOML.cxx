@@ -20,7 +20,7 @@
 #include "LexAccessor.h"
 #include "Accessor.h"
 #include "StyleContext.h"
-#include "CharacterSet.h"
+#include "LexCharacterSet.h"
 #include "LexerModule.h"
 
 using namespace Lexilla;
@@ -88,7 +88,7 @@ constexpr int GetStringQuote(int state) noexcept {
 	return IsDoubleQuoted(state) ? '\"' : '\'';
 }
 
-constexpr bool IsTOMLOperator(int ch) noexcept {
+/*constexpr*/ bool IsTOMLOperator(int ch) noexcept {
 	return AnyOf(ch, '[', ']', '{', '}', ',', '=', '.', '+', '-');
 }
 
